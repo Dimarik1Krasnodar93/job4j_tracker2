@@ -12,7 +12,7 @@ import java.util.List;
 
 public class StartUI {
 
-    public void init(Input input, MemTracker tracker, List<UserAction> actions) {
+    public void init(Input input, Store tracker, List<UserAction> actions) {
         boolean run = true;
         while (run) {
             showMenu(actions);
@@ -44,7 +44,7 @@ public class StartUI {
                 new FindByNameAction(output),
                 new ExitAction()
         );
-        MemTracker tracker = new MemTracker();
+        Store tracker = new MemTracker();
         new StartUI().init(validate, tracker, actions);
     }
 }
