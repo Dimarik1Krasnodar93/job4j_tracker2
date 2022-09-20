@@ -44,7 +44,7 @@ public class StartUI {
                 new FindByNameAction(output),
                 new ExitAction()
         );
-        Store tracker = new MemTracker();
+        Store tracker = new SqlTracker();
         new StartUI().init(validate, tracker, actions);
     }
 }

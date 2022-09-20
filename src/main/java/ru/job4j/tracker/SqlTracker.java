@@ -2,6 +2,7 @@ package ru.job4j.tracker;
 
 import ru.job4j.tracker.model.Item;
 
+import javax.swing.plaf.nimbus.State;
 import java.io.InputStream;
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,6 +12,10 @@ import java.util.Properties;
 public class SqlTracker implements Store, AutoCloseable {
 
     private Connection cn;
+
+    public SqlTracker() {
+        init();
+    }
 
     public void init() {
         try (InputStream in = SqlTracker.class.getClassLoader().getResourceAsStream("app.properties")) {
@@ -36,10 +41,19 @@ public class SqlTracker implements Store, AutoCloseable {
 
     @Override
     public Item add(Item item) {
-        try (PreparedStatement pst = cn.prepareStatement("insert into items (name, created) values (?, ?)")) {
+        try (PreparedStatement pst = cn.prepareStatement("insert into items "
+                + "(name, created) values (?, ?)");
+             Statement st = cn.createStatement();
+        ) {
             pst.setString(1, item.getName());
-            pst.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            pst.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
             pst.execute();
+            ResultSet res = st.executeQuery("select id from items order by "
+                    + "id desc limit 1");
+            while (res.next()) {
+                item.setId(res.getInt("id"));
+            }
+
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -49,11 +63,12 @@ public class SqlTracker implements Store, AutoCloseable {
     @Override
     public boolean replace(int id, Item item) {
         boolean rsl = false;
-        try (PreparedStatement pst = cn.prepareStatement("update items set id = ? where name = ?")) {
+        try (PreparedStatement pst = cn.prepareStatement("update items set id = ? "
+                + "created = ? where name = ?")) {
             pst.setInt(1, id);
-            pst.setString(2, item.getName());
-            pst.execute();
-            rsl = true;
+            pst.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
+            pst.setString(3, item.getName());
+            rsl = pst.executeUpdate() > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -65,8 +80,7 @@ public class SqlTracker implements Store, AutoCloseable {
         boolean rsl = false;
         try (PreparedStatement pst = cn.prepareStatement("delete from items where id = ?")) {
             pst.setInt(1, id);
-            rsl = pst.execute();
-            rsl = true;
+            rsl = pst.executeUpdate() > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -108,7 +122,7 @@ public class SqlTracker implements Store, AutoCloseable {
         try (PreparedStatement pst = cn.prepareStatement("select * from items where id = ?")) {
             pst.setInt(1, id);
             ResultSet rslSet = pst.executeQuery();
-            while (rslSet.next()) {
+            if (rslSet.next()) {
                 rsl = new Item(rslSet.getString(2));
             }
         } catch (SQLException ex) {
