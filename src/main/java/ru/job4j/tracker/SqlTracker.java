@@ -43,21 +43,28 @@ public class SqlTracker implements Store, AutoCloseable {
         }
     }
 
+    private int getGeneratedKeys(PreparedStatement pst) {
+        int rsl = -1;
+        try (ResultSet generatedKeys = pst.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                rsl = generatedKeys.getInt(1);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return rsl;
+    }
+
     @Override
     public Item add(Item item) {
         try (PreparedStatement pst = cn.prepareStatement("insert into items "
-                + "(name, created) values (?, ?)");
+                + "(name, created) values (?, ?)", Statement.RETURN_GENERATED_KEYS);
              Statement st = cn.createStatement();
         ) {
             pst.setString(1, item.getName());
             pst.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
             pst.execute();
-            ResultSet res = st.executeQuery("select id from items order by "
-                    + "id desc limit 1");
-            while (res.next()) {
-                item.setId(res.getInt("id"));
-            }
-
+            item.setId(getGeneratedKeys(pst));
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -67,11 +74,11 @@ public class SqlTracker implements Store, AutoCloseable {
     @Override
     public boolean replace(int id, Item item) {
         boolean rsl = false;
-        try (PreparedStatement pst = cn.prepareStatement("update items set id = ? "
-                + "created = ? where name = ?")) {
-            pst.setInt(1, id);
+        try (PreparedStatement pst = cn.prepareStatement("update items set name = ? "
+                + "created = ? where id = ?")) {
+            pst.setString(1, item.getName());
             pst.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
-            pst.setString(3, item.getName());
+            pst.setInt(3, id);
             rsl = pst.executeUpdate() > 0;
         } catch (SQLException ex) {
             ex.printStackTrace();
