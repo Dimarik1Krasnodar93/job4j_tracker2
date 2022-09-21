@@ -12,6 +12,11 @@ public class MemTracker implements Store {
 
     private int id = 0;
 
+    @Override
+    public void close() {
+
+    }
+
     public Item add(Item item) {
         item.setId(id++);
         items.add(item);

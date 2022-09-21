@@ -134,7 +134,7 @@ public class SqlTracker implements Store, AutoCloseable {
             pst.setInt(1, id);
             ResultSet rslSet = pst.executeQuery();
             if (rslSet.next()) {
-                rsl = new Item(rslSet.getString(2));
+                rsl = new Item(id, rslSet.getString(2), rslSet.getTimestamp(3).toLocalDateTime());
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
