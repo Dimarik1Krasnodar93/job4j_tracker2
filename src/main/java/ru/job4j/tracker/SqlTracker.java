@@ -8,6 +8,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class SqlTracker implements Store, AutoCloseable {
 
@@ -43,28 +45,16 @@ public class SqlTracker implements Store, AutoCloseable {
         }
     }
 
-    private int getGeneratedKeys(PreparedStatement pst) {
-        int rsl = -1;
-        try (ResultSet generatedKeys = pst.getGeneratedKeys()) {
-            if (generatedKeys.next()) {
-                rsl = generatedKeys.getInt(1);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return rsl;
-    }
-
     @Override
     public Item add(Item item) {
         try (PreparedStatement pst = cn.prepareStatement("insert into items "
                 + "(name, created) values (?, ?)", Statement.RETURN_GENERATED_KEYS);
-             Statement st = cn.createStatement();
+             ResultSet generatedKeys = pst.getGeneratedKeys()
         ) {
             pst.setString(1, item.getName());
             pst.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
             pst.execute();
-            item.setId(getGeneratedKeys(pst));
+            item.setId(generatedKeys.getInt(1));
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -98,13 +88,37 @@ public class SqlTracker implements Store, AutoCloseable {
         return rsl;
     }
 
+    private List<Item> findUniversal(String method, Supplier<Object> supplier) {
+        StringBuilder sqlQuery = new StringBuilder("select * from items");
+        if ("findByName".equals(method)) {
+            sqlQuery.append("  where name = ?");
+        } else if ("findById".equals(method)) {
+            sqlQuery.append("  where id = ?");
+        }
+        List<Item> rsl = new ArrayList<>();
+        try (PreparedStatement pst = cn.prepareStatement(sqlQuery.toString())) {
+            if ("findByName".equals(method)) {
+                pst.setString(1, supplier.get().toString());
+            } else if ("findById".equals(method)) {
+                pst.setInt(1, (Integer)supplier.get());
+            }
+            ResultSet rslSet = pst.executeQuery(sqlQuery.toString());
+            while (rslSet.next()) {
+                rsl.add(new Item(rslSet.getInt(3), rslSet.getString(2), rslSet.getTimestamp(4).toLocalDateTime()));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return rsl;
+    }
+
     @Override
     public List<Item> findAll() {
         List<Item> rsl = new ArrayList<>();
         try (Statement pst = cn.createStatement()) {
             ResultSet rslSet = pst.executeQuery("select * from items");
             while (rslSet.next()) {
-                rsl.add(new Item(rslSet.getString(2)));
+                rsl.add(new Item(rslSet.getInt(3), rslSet.getString(2), rslSet.getTimestamp(4).toLocalDateTime()));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -114,30 +128,17 @@ public class SqlTracker implements Store, AutoCloseable {
 
     @Override
     public List<Item> findByName(String key) {
-        List<Item> rsl = new ArrayList<>();
-        try (PreparedStatement pst = cn.prepareStatement("select * from items where name = ?")) {
-            pst.setString(1, key);
-            ResultSet rslSet = pst.executeQuery();
-            while (rslSet.next()) {
-                rsl.add(new Item(rslSet.getString(2)));
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        return rsl;
+        Supplier<Object> sup = () -> key;
+        return findUniversal("findByName", sup);
     }
 
     @Override
     public Item findById(int id) {
+        Supplier<Object> sup = () -> id;
+        List<Item> lItem = findUniversal("findById", sup);
         Item rsl = null;
-        try (PreparedStatement pst = cn.prepareStatement("select * from items where id = ?")) {
-            pst.setInt(1, id);
-            ResultSet rslSet = pst.executeQuery();
-            if (rslSet.next()) {
-                rsl = new Item(id, rslSet.getString(2), rslSet.getTimestamp(3).toLocalDateTime());
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        if (lItem.size() > 0) {
+            rsl = lItem.get(0);
         }
         return rsl;
     }
