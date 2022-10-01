@@ -55,7 +55,9 @@ public class SqlTracker implements Store, AutoCloseable {
             pst.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
             pst.execute();
             ResultSet generatedKeys = pst.getGeneratedKeys();
-            item.setId(generatedKeys.getInt(1));
+            if (generatedKeys.next()) {
+                item.setId(generatedKeys.getInt(1));
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -65,7 +67,7 @@ public class SqlTracker implements Store, AutoCloseable {
     @Override
     public boolean replace(int id, Item item) {
         boolean rsl = false;
-        try (PreparedStatement pst = cn.prepareStatement("update items set name = ? "
+        try (PreparedStatement pst = cn.prepareStatement("update items set name = ?, "
                 + "created = ? where id = ?")) {
             pst.setString(1, item.getName());
             pst.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
@@ -95,7 +97,7 @@ public class SqlTracker implements Store, AutoCloseable {
         try (Statement pst = cn.createStatement()) {
             ResultSet rslSet = pst.executeQuery("select * from items");
             while (rslSet.next()) {
-                rsl.add(new Item(rslSet.getString(2)));
+                rsl.add(itemFromRsultSet(rslSet));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -110,7 +112,7 @@ public class SqlTracker implements Store, AutoCloseable {
             pst.setString(1, key);
             ResultSet rslSet = pst.executeQuery();
             while (rslSet.next()) {
-                rsl.add(new Item(rslSet.getString(2)));
+                rsl.add(itemFromRsultSet(rslSet));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -125,7 +127,7 @@ public class SqlTracker implements Store, AutoCloseable {
             pst.setInt(1, id);
             ResultSet rslSet = pst.executeQuery();
             if (rslSet.next()) {
-                rsl = new Item(rslSet.getString(2));
+                rsl = itemFromRsultSet(rslSet);
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
