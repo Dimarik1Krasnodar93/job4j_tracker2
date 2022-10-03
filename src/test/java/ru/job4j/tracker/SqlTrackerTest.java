@@ -73,7 +73,7 @@ public class SqlTrackerTest {
         int id = tracker.findByName(item.getName()).get(0).getId();
         Item item3 = new Item("item1_3");
         item3.setId(id);
-        tracker.replace(id, item3);;
+        tracker.replace(id, item3);
         assertThat(tracker.findById(id), is(item3));
     }
 
