@@ -66,6 +66,7 @@ public class SqlTracker implements Store, AutoCloseable {
 
     @Override
     public boolean replace(int id, Item item) {
+        List<Item> items = findAll();
         boolean rsl = false;
         try (PreparedStatement pst = cn.prepareStatement("update items set name = ?, "
                 + "created = ? where id = ?")) {
@@ -76,6 +77,7 @@ public class SqlTracker implements Store, AutoCloseable {
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
+        List<Item> items2 = findAll();
         return rsl;
     }
 
