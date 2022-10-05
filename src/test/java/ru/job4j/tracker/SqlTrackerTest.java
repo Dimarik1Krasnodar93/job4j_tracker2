@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -61,8 +62,18 @@ public class SqlTrackerTest {
     @Test
     public void whenFindByName() {
         SqlTracker tracker = new SqlTracker(connection);
-        Item item = tracker.add(new Item("item1"));
-        assertThat(tracker.findByName(item.getName()).get(0), is(item));
+        List<Item> list = List.of(tracker.add(new Item("item")), tracker.add(new Item("item")));
+        assertThat(tracker.findByName(list.get(0).getName()), is(list));
+    }
+
+    @Test
+    public void whenFindAll() {
+        SqlTracker tracker = new SqlTracker(connection);
+        List<Item> list = new ArrayList<>();
+        list.add(tracker.add(new Item("item1")));
+        list.add(tracker.add(new Item("item2")));
+        list.add(tracker.add(new Item("item3")));
+        assertThat(tracker.findAll(), is(list));
     }
 
     @Test
@@ -70,8 +81,8 @@ public class SqlTrackerTest {
         SqlTracker tracker = new SqlTracker(connection);
         Item item = tracker.add(new Item("item1_1"));
         Item item2 = tracker.add(new Item("item1_2"));
-        int id = tracker.findByName(item.getName()).get(0).getId();
         Item item3 = new Item("item1_3");
+        int id = item.getId();
         item3.setId(id);
         tracker.replace(id, item3);
         assertThat(tracker.findById(id), is(item3));
@@ -81,10 +92,8 @@ public class SqlTrackerTest {
     public void whenDelete() {
         SqlTracker tracker = new SqlTracker(connection);
         Item item = tracker.add(new Item("item1_1"));
-        Item item2 = new Item("item1_2");
-        tracker.add(item2);
-        tracker.delete(1);
-        assertThat(tracker.findById(1), is(nullValue()));
+        tracker.add(item);
+        tracker.delete(item.getId());
+        assertThat(tracker.findById(item.getId()), is(nullValue()));
     }
-
 }

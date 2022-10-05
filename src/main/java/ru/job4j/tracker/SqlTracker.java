@@ -49,7 +49,6 @@ public class SqlTracker implements Store, AutoCloseable {
     public Item add(Item item) {
         try (PreparedStatement pst = cn.prepareStatement("insert into items "
                 + "(name, created) values (?, ?)", Statement.RETURN_GENERATED_KEYS);
-
         ) {
             pst.setString(1, item.getName());
             pst.setTimestamp(2, Timestamp.valueOf(item.getCreated()));
