@@ -2,10 +2,15 @@ package ru.job4j.tracker.model;
 
 import lombok.Data;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
+
+@Entity
+@Table(name = "items")
 @Data
 public class Item {
 
@@ -17,6 +22,10 @@ public class Item {
     private String name;
 
     private LocalDateTime created = LocalDateTime.now();
+
+    public Item() {
+
+    }
 
     public Item(String name) {
         this.name = name;
