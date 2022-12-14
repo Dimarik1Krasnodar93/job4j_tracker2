@@ -2,12 +2,12 @@ package ru.job4j.tracker.store;
 
 import org.junit.Test;
 import ru.job4j.tracker.model.Item;
-
 import java.util.List;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class MemTrackerTest {
 
@@ -90,4 +90,31 @@ public class MemTrackerTest {
         assertThat(memTracker.findById(item1.getId()), is(nullValue()));
     }
 
+    @Test
+    public void whenDeleteMockito() {
+        MemTracker memTracker = new MemTracker();
+        Item itemDelete = mock(Item.class);
+        when(itemDelete.getId()).thenReturn(1);
+        memTracker.add(itemDelete);
+        memTracker.delete(itemDelete.getId());
+        assertThat(memTracker.findById(itemDelete.getId()), is(nullValue()));
+    }
+
+    @Test
+    public void whenFindByIdActionMockito() {
+        MemTracker memTracker = new MemTracker();
+        Item item = mock(Item.class);
+        when(item.getId()).thenReturn(1);
+        memTracker.add(item);
+        assertThat(memTracker.findById(1), is(item));
+    }
+
+    @Test
+    public void whenFindByNameActionMockito() {
+        MemTracker memTracker = new MemTracker();
+        Item item = mock(Item.class);
+        when(item.getName()).thenReturn("test");
+        memTracker.add(item);
+        assertThat(memTracker.findByName("test").get(0).getName(), is("test"));
+    }
 }
