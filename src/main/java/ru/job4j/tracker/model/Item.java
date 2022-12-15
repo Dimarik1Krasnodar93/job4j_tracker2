@@ -1,7 +1,6 @@
 package ru.job4j.tracker.model;
 
 import lombok.Data;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
