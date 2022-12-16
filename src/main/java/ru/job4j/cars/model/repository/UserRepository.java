@@ -46,7 +46,7 @@ public class UserRepository {
      * @return пользователь с id.
      */
     public User create(User user) {
-        User result = new User((int)session.save(user), user.getLogin(), user.getPassword());
+        User result = new User((int) session.save(user), user.getLogin(), user.getPassword());
         return result;
     }
 
