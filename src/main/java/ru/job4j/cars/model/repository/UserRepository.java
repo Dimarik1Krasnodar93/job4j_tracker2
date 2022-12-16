@@ -35,10 +35,10 @@ public class UserRepository {
      * В сессию вынесли в поля объекта для оптимизации
      * закрываем сессию перед удалением объекта
      */
-    @Override
     public void finalize() {
         session.close();
     }
+
 
     /**
      * Сохранить в базе.
@@ -57,7 +57,7 @@ public class UserRepository {
     public void update(User user) {
         try {
             session.beginTransaction();
-            session.createQuery("Update Item set login = :fLogin, password = :fPassword WHERE id = :fId")
+            session.createQuery("Update User set login = :fLogin, password = :fPassword WHERE id = :fId", User.class)
                     .setParameter("fLogin", user.getLogin())
                     .setParameter("password", user.getPassword())
                     .executeUpdate();
@@ -74,7 +74,7 @@ public class UserRepository {
     public void delete(int userId) {
         try {
             session.beginTransaction();
-            session.createQuery("DELETE Item Where id = :fId")
+            session.createQuery("DELETE User Where id = :fId", User.class)
                     .setParameter("fId", userId)
                     .executeUpdate();
             session.getTransaction().commit();
@@ -88,7 +88,7 @@ public class UserRepository {
      * @return список пользователей.
      */
     public List<User> findAllOrderById() {
-        Query query = session.createQuery("from Item order by id");
+        Query query = session.createQuery("from User order by id", User.class);
         return query.list();
     }
 
@@ -97,7 +97,7 @@ public class UserRepository {
      * @return пользователь.
      */
     public Optional<User> findById(int id) {
-        Query query = session.createQuery("from item where id = :fId")
+        Query query = session.createQuery("from User where id = :fId", User.class)
                 .setParameter("fId", id);
         List<User> listuser = query.list();
         if (listuser.size() > 0) {
@@ -112,8 +112,8 @@ public class UserRepository {
      * @return список пользователей.
      */
     public List<User> findByLikeLogin(String key) {
-        Query query = session.createQuery("from Item where name Like %:fKey%")
-                .setParameter("fKey", key);
+        Query query = session.createQuery("from User where name Like :fKey", User.class)
+                .setParameter("fKey", '%' + key + '%');
         return query.list();
     }
 
@@ -123,7 +123,7 @@ public class UserRepository {
      * @return Optional or user.
      */
     public Optional<User> findByLogin(String login) {
-        Query query = session.createQuery("from Item where name = :login")
+        Query query = session.createQuery("from User where name = :login", User.class)
                 .setParameter("login", login);
         List<User> listUser = query.list();
         if (listUser.size() > 0) {
