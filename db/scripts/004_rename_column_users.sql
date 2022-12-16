@@ -1,0 +1,1 @@
+alter table users rename name to login;
