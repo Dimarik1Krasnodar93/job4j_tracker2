@@ -1,1 +1,1 @@
-alter table users rename name to login;
+alter table users rename column name to login;
