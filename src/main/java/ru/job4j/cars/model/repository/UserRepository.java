@@ -20,7 +20,15 @@ public class UserRepository {
      */
     public User create(User user) {
         Session session = sf.openSession();
-        User result = new User((int) session.save(user), user.getLogin(), user.getPassword());
+        User result = null;
+        try {
+            session.beginTransaction();
+            result = new User((int) session.save(user), user.getLogin(), user.getPassword());
+            session.getTransaction().commit();
+        } catch (Exception e) {
+            e.printStackTrace();
+            session.getTransaction().rollback();
+        }
         session.close();
         return result;
     }
@@ -109,11 +117,15 @@ public class UserRepository {
      * @return Optional or user.
      */
     public Optional<User> findByLogin(String login) {
-        Optional<User> result;
+        Optional<User> result = Optional.empty();
         Session session = sf.openSession();
-        Query query = session.createQuery("from User where login = :login", User.class)
-                .setParameter("login", login);
-        result = query.uniqueResultOptional();
+        try {
+            Query query = session.createQuery("from User where login = :login", User.class)
+                    .setParameter("login", login);
+            result = query.uniqueResultOptional();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         session.close();
         return result;
     }

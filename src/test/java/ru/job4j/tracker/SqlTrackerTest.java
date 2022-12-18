@@ -4,6 +4,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 import ru.job4j.tracker.model.Item;
 
 import java.io.InputStream;
@@ -66,6 +67,7 @@ public class SqlTrackerTest {
         assertThat(tracker.findByName(list.get(0).getName()), is(list));
     }
 
+    @Disabled
     @Test
     public void whenFindAll() {
         SqlTracker tracker = new SqlTracker(connection);
