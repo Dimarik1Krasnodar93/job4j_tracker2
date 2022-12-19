@@ -20,17 +20,16 @@ public class UserRepository {
      */
     public User create(User user) {
         Session session = sf.openSession();
-        User result = null;
         try {
             session.beginTransaction();
-            result = new User((int) session.save(user), user.getLogin(), user.getPassword());
+            session.save(user);
             session.getTransaction().commit();
         } catch (Exception e) {
             e.printStackTrace();
             session.getTransaction().rollback();
         }
         session.close();
-        return result;
+        return user;
     }
 
     /**
@@ -77,7 +76,7 @@ public class UserRepository {
     public List<User> findAllOrderById() {
         List<User> result;
         Session session = sf.openSession();
-        Query query = session.createQuery("from User order by id", User.class);
+        Query query = session.createQuery("SELECT t.id, t.login, t.password from Users t order by t.id", User.class);
         result = query.list();
         session.close();
         return result;
@@ -90,7 +89,7 @@ public class UserRepository {
     public Optional<User> findById(int id) {
         Optional<User> result;
         Session session = sf.openSession();
-        Query query = session.createQuery("from User where id = :fId", User.class)
+        Query query = session.createQuery("SELECT t.id, t.login, t.password from Users t  where t.id = :fId", User.class)
                 .setParameter("fId", id);
         result = query.uniqueResultOptional();
         session.close();
@@ -105,7 +104,7 @@ public class UserRepository {
     public List<User> findByLikeLogin(String key) {
         List<User> result;
         Session session = sf.openSession();
-        Query query = session.createQuery("from User where login Like :fKey", User.class)
+        Query query = session.createQuery("SELECT t.id, t.login, t.password from Users t  where t.login Like :fKey", User.class)
                 .setParameter("fKey", '%' + key + '%');
         result = query.list();
         return result;
@@ -120,7 +119,7 @@ public class UserRepository {
         Optional<User> result = Optional.empty();
         Session session = sf.openSession();
         try {
-            Query query = session.createQuery("from User where login = :login", User.class)
+            Query query = session.createQuery("SELECT t.id, t.login, t.password from Users t  where t.login = :login", User.class)
                     .setParameter("login", login);
             result = query.uniqueResultOptional();
         } catch (Exception ex) {
