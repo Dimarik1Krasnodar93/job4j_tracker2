@@ -7,12 +7,9 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.query.Query;
 import ru.job4j.tracker.model.Item;
-
-import java.io.InputStream;
-import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+
 
 public class HbmTracker implements Store, AutoCloseable {
 
@@ -97,7 +94,7 @@ public class HbmTracker implements Store, AutoCloseable {
         Session session = sf.openSession();
         Query query = session.createQuery("select from item i where i.id = :fId");
         query.setParameter("fId", id);
-        result =  (Item) query.uniqueResultOptional().get();
+        result =  (Item) query.uniqueResult();
         session.close();
         return result;
     }
