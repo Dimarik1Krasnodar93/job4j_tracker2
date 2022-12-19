@@ -73,7 +73,6 @@ public class SqlTrackerTest {
     }
 
     @Ignore
-    @Disabled
     @Test
     public void whenFindAll() {
         SqlTracker tracker = new SqlTracker(connection);
