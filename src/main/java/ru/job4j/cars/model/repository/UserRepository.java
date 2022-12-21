@@ -11,6 +11,14 @@ import java.util.Optional;
 
 @AllArgsConstructor
 public class UserRepository {
+
+    public static final String QUERY_UPDATE = "Update User set login = :fLogin, password = :fPassword WHERE id = :fId";
+    public static final String QUERY_DELETE = "DELETE User Where id = :fId";
+    public static final String QUERY_FIND_BY_ORDER_ID = "SELECT u from User As u order by u.id";
+    public static final String QUERY_FIND_BY_ID = "SELECT u from User As u where u.id = :fId";
+    public static final String QUERY_FIND_LIKE_LOGIN = "SELECT u from User As u where u.login Like :fKey";
+    public static final String QUERY_FIND_BY_LOGIN = "SELECT u from User As u where u.login = :login";
+
     private final SessionFactory sf;
 
     /**
@@ -40,7 +48,7 @@ public class UserRepository {
         Session session = sf.openSession();
         try {
             session.beginTransaction();
-            session.createQuery("Update User set login = :fLogin, password = :fPassword WHERE id = :fId", User.class)
+            session.createQuery(QUERY_UPDATE, User.class)
                     .setParameter("fLogin", user.getLogin())
                     .setParameter("password", user.getPassword())
                     .executeUpdate();
@@ -59,7 +67,7 @@ public class UserRepository {
         Session session = sf.openSession();
         try {
             session.beginTransaction();
-            session.createQuery("DELETE User Where id = :fId", User.class)
+            session.createQuery(QUERY_DELETE, User.class)
                     .setParameter("fId", userId)
                     .executeUpdate();
             session.getTransaction().commit();
@@ -76,7 +84,7 @@ public class UserRepository {
     public List<User> findAllOrderById() {
         List<User> result;
         Session session = sf.openSession();
-        Query<User> query = session.createQuery("SELECT u from User As u order by u.id", User.class);
+        Query<User> query = session.createQuery(QUERY_FIND_BY_ORDER_ID, User.class);
         result = query.list();
         session.close();
         return result;
@@ -89,7 +97,7 @@ public class UserRepository {
     public Optional<User> findById(int id) {
         Optional<User> result;
         Session session = sf.openSession();
-        Query<User> query = session.createQuery("SELECT u from User As u where u.id = :fId", User.class)
+        Query<User> query = session.createQuery(QUERY_FIND_BY_ID, User.class)
                 .setParameter("fId", id);
         result = query.uniqueResultOptional();
         session.close();
@@ -104,7 +112,7 @@ public class UserRepository {
     public List<User> findByLikeLogin(String key) {
         List<User> result;
         Session session = sf.openSession();
-        Query<User> query = session.createQuery("SELECT u from User As u where u.login Like :fKey", User.class)
+        Query<User> query = session.createQuery(QUERY_FIND_LIKE_LOGIN, User.class)
                 .setParameter("fKey", '%' + key + '%');
         result = query.list();
         return result;
@@ -119,7 +127,7 @@ public class UserRepository {
         Optional<User> result = Optional.empty();
         Session session = sf.openSession();
         try {
-            Query<User> query = session.createQuery("SELECT u from User As u where u.login = :login", User.class)
+            Query<User> query = session.createQuery(QUERY_FIND_BY_LOGIN, User.class)
                     .setParameter("login", login);
             result = query.uniqueResultOptional();
         } catch (Exception ex) {
