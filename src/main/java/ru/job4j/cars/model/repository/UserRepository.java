@@ -82,10 +82,17 @@ public class UserRepository {
      * @return список пользователей.
      */
     public List<User> findAllOrderById() {
-        List<User> result;
+        List<User> result = null;
         Session session = sf.openSession();
-        Query<User> query = session.createQuery(QUERY_FIND_BY_ORDER_ID, User.class);
-        result = query.list();
+        try {
+            session.beginTransaction();
+            Query<User> query = session.createQuery(QUERY_FIND_BY_ORDER_ID, User.class);
+            result = query.list();
+            session.getTransaction().rollback();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            session.getTransaction().rollback();
+        }
         session.close();
         return result;
     }
@@ -95,11 +102,18 @@ public class UserRepository {
      * @return пользователь.
      */
     public Optional<User> findById(int id) {
-        Optional<User> result;
+        Optional<User> result = null;
         Session session = sf.openSession();
-        Query<User> query = session.createQuery(QUERY_FIND_BY_ID, User.class)
-                .setParameter("fId", id);
-        result = query.uniqueResultOptional();
+        try {
+            session.beginTransaction();
+            Query<User> query = session.createQuery(QUERY_FIND_BY_ID, User.class)
+                    .setParameter("fId", id);
+            result = query.uniqueResultOptional();
+            session.getTransaction().commit();
+        } catch (Exception ex) {
+            session.getTransaction().rollback();
+            ex.printStackTrace();
+        }
         session.close();
         return result;
     }
@@ -110,11 +124,18 @@ public class UserRepository {
      * @return список пользователей.
      */
     public List<User> findByLikeLogin(String key) {
-        List<User> result;
+        List<User> result = null;
         Session session = sf.openSession();
-        Query<User> query = session.createQuery(QUERY_FIND_LIKE_LOGIN, User.class)
-                .setParameter("fKey", '%' + key + '%');
-        result = query.list();
+        try {
+            session.beginTransaction();
+            Query<User> query = session.createQuery(QUERY_FIND_LIKE_LOGIN, User.class)
+                    .setParameter("fKey", '%' + key + '%');
+            result = query.list();
+            session.getTransaction().commit();
+        } catch (Exception ex) {
+            session.getTransaction().rollback();
+            ex.printStackTrace();
+        }
         return result;
     }
 
@@ -127,11 +148,14 @@ public class UserRepository {
         Optional<User> result = Optional.empty();
         Session session = sf.openSession();
         try {
+            session.beginTransaction();
             Query<User> query = session.createQuery(QUERY_FIND_BY_LOGIN, User.class)
                     .setParameter("login", login);
             result = query.uniqueResultOptional();
+            session.getTransaction().commit();
         } catch (Exception ex) {
             ex.printStackTrace();
+            session.getTransaction().rollback();
         }
         session.close();
         return result;
