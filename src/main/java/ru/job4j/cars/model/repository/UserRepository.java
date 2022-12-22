@@ -6,6 +6,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import ru.job4j.cars.model.User;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,7 +83,7 @@ public class UserRepository {
      * @return список пользователей.
      */
     public List<User> findAllOrderById() {
-        List<User> result = null;
+        List<User> result = new ArrayList<>();
         Session session = sf.openSession();
         try {
             session.beginTransaction();
@@ -102,7 +103,7 @@ public class UserRepository {
      * @return пользователь.
      */
     public Optional<User> findById(int id) {
-        Optional<User> result = null;
+        Optional<User> result = Optional.empty();
         Session session = sf.openSession();
         try {
             session.beginTransaction();
