@@ -13,12 +13,12 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserRepository {
 
-    public static final String QUERY_UPDATE = "Update User set login = :fLogin, password = :fPassword WHERE id = :fId";
-    public static final String QUERY_DELETE = "DELETE User Where id = :fId";
-    public static final String QUERY_FIND_BY_ORDER_ID = "SELECT u from User As u order by u.id";
-    public static final String QUERY_FIND_BY_ID = "SELECT u from User As u where u.id = :fId";
-    public static final String QUERY_FIND_LIKE_LOGIN = "SELECT u from User As u where u.login Like :fKey";
-    public static final String QUERY_FIND_BY_LOGIN = "SELECT u from User As u where u.login = :login";
+    public static final String QUERY_UPDATE = "UPDATE User SET login = :fLogin, password = :fPassword WHERE id = :fId";
+    public static final String QUERY_DELETE = "DELETE User WHERE id = :fId";
+    public static final String QUERY_FIND_BY_ORDER_ID = "SELECT u FROM User As u ORDER BY u.id";
+    public static final String QUERY_FIND_BY_ID = "SELECT u FROM User As u WHERE u.id = :fId";
+    public static final String QUERY_FIND_LIKE_LOGIN = "SELECT u FROM User AS u WHERE u.login LIKE :fKey";
+    public static final String QUERY_FIND_BY_LOGIN = "SELECT u FROM User AS u WHERE u.login = :login";
 
     private final SessionFactory sf;
 
