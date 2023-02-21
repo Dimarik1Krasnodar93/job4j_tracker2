@@ -15,5 +15,8 @@
 
         <mapping class="ru.job4j.tracker.model.Item" />
         <mapping class="ru.job4j.cars.model.User" />
+        <mapping class="ru.job4j.toone.Role"/>
+        <mapping class="ru.job4j.toone.User"/>
+
     </session-factory>
 </hibernate-configuration>

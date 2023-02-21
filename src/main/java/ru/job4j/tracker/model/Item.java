@@ -1,10 +1,12 @@
 package ru.job4j.tracker.model;
 
 import lombok.Data;
+import ru.job4j.toone.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -36,6 +38,14 @@ public class Item {
         this.name = name;
         this.created = created;
     }
+
+    @ManyToMany
+    @JoinTable(
+            name = "participates",
+            joinColumns = { @JoinColumn(name = "item_id") },
+            inverseJoinColumns = { @JoinColumn(name = "user_id") }
+    )
+    private List<User> participates;
 
     @Override
     public String toString() {
