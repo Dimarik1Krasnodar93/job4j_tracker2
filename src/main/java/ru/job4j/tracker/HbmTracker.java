@@ -61,7 +61,7 @@ public class HbmTracker implements Store, AutoCloseable {
     @Override
     public boolean delete(int id) {
         Session session = sf.openSession();
-        Query query = session.createQuery("delete from Item i  where i.id = :fId");
+        Query query = session.createQuery("delete Item i  where i.id = :fId");
         int count = 0;
         try {
             session.beginTransaction();
