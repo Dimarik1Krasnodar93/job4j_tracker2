@@ -1,14 +1,7 @@
 package ru.job4j.tracker;
 
 import org.junit.*;
-import org.junit.jupiter.api.Disabled;
-import ru.job4j.tracker.action.ReplaceAction;
-import ru.job4j.tracker.input.Input;
 import ru.job4j.tracker.model.Item;
-import ru.job4j.tracker.output.ConsoleOutput;
-import ru.job4j.tracker.output.Output;
-import ru.job4j.tracker.store.MemTracker;
-
 import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,13 +10,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class SqlTrackerTest {
 

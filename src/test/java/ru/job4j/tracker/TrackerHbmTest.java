@@ -1,7 +1,6 @@
 package ru.job4j.tracker;
 
-import org.assertj.core.data.Percentage;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import ru.job4j.tracker.model.Item;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -18,7 +17,6 @@ public class TrackerHbmTest {
             assertThat(result.getName()).isEqualTo("test1");
         }
     }
-
 
     @Test
     public void whenAddNewItemThenTrackerHasSameItemFindBy() throws Exception {
